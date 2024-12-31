@@ -1,54 +1,35 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   client.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: obastug <obastug@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/12/31 13:29:06 by obastug           #+#    #+#             */
+/*   Updated: 2024/12/31 13:35:33 by obastug          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <unistd.h>
 #include <signal.h>
 #include <stdlib.h>
-#include <stdio.h>
-void	msg_retrieved()
+
+int	ft_atoi(const char *nptr);
+int	ft_strlen(const char *str);
+
+void	msg_retrieved(int sig)
 {
-	write(STDOUT_FILENO, "message retrieved", 17);
-	exit(0);
-}
-
-int	ft_strlen(const char *str)
-{
-	int	i;
-
-	i = 0;
-	while(str[i])
-		i++;
-	return (i);
-}
-
-int	ft_atoi(const char *nptr)
-{
-	register int	i;
-	register long	ret;
-	char			sign;
-
-	ret = 0;
-	i = 0;
-	sign = 1;
-	while (nptr[i] == ' ' || nptr[i] == '\t' || nptr[i] == '\v'
-		|| nptr[i] == '\f' || nptr[i] == '\n' || nptr[i] == '\r')
-		i++;
-	if (nptr[i] == '+' || nptr[i] == '-')
+	if (sig == SIGUSR1)
 	{
-		if (nptr[i] == '-')
-			sign = -1;
-		i++;
+		write(STDOUT_FILENO, "message retrieved", 17);
+		exit(0);
 	}
-	while (nptr[i] >= '0' && nptr[i] <= '9')
-	{
-		ret = (ret * 10) + (nptr[i] - '0');
-		i++;
-	}
-	return ((int)ret * sign);
 }
 
 void	send_int_to_pid(__pid_t pid, int number)
 {
 	size_t	i;
-	
-	printf("number %d sending to pid: %d\n", number, pid);
+
 	i = 0;
 	while (i < 32)
 	{
@@ -68,19 +49,17 @@ void	send_string_to_pid(int server_pid, const char *str)
 	while (1)
 	{
 		i = 0;
-		printf("char %c sending to process %d\n", *str, server_pid);
 		while (i < 8)
 		{
 			if ((*str >> i) & 1)
 				kill(server_pid, SIGUSR1);
 			else
 				kill(server_pid, SIGUSR2);
-			printf("%ld", i);
 			i++;
 			usleep(700);
 		}
 		if (!*str)
-			break;
+			break ;
 		str++;
 	}
 	send_int_to_pid(server_pid, getpid());
