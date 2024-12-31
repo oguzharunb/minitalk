@@ -1,22 +1,25 @@
-CLIENT_SRCS = server.c
-SERVER_SRCS = client.c
-CLIENT_OBJS = $($(CLIENT_SRCS:.c=.o))
-SERVER_OBJS = $($(SERVER_SRCS:.c=.o))
+CLIENT_SRCS = client.c
+SERVER_SRCS = server.c
+CLIENT_OBJS = $(CLIENT_SRCS:.c=.o)
+SERVER_OBJS = $(SERVER_SRCS:.c=.o)
 CLIENT = client
 SERVER = server
 CC = cc
-FLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror
 
 all: $(CLIENT) $(SERVER)
 
 $(CLIENT): $(CLIENT_OBJS)
-	cc $(CLIENT_OBJS) -o $(CLIENT)
+	$(CC) $(CLIENT_OBJS) -o $(CLIENT)
 
 $(SERVER): $(SERVER_OBJS)
-	cc $(SERVER_OBJS) -o $(SERVER)
+	$(CC) $(SERVER_OBJS) -o $(SERVER)
 
 clean:
 	rm $(CLIENT_OBJS) $(SERVER_OBJS)
+
+%o: %c
+	$(CC) $(FLAGS) -c $< -o $@
 
 fclean: clean
 	rm $(CLIENT) $(SERVER)
