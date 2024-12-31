@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   server.c                                           :+:      :+:    :+:   */
+/*   server_bonus.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: obastug <obastug@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/12/31 13:29:10 by obastug           #+#    #+#             */
-/*   Updated: 2024/12/31 15:11:57 by obastug          ###   ########.fr       */
+/*   Created: 2024/12/31 14:44:28 by obastug           #+#    #+#             */
+/*   Updated: 2024/12/31 15:01:35 by obastug          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,16 +46,26 @@ void	ft_putstr(char *str)
 
 void	listener(int sig)
 {
+	static int	status;
 	static int	number;
 	static int	counter;
 
 	if (sig == SIGUSR1)
 		number = number + (1 << counter);
 	counter++;
-	if (counter == 8)
+	if ((status == 1) && (counter == 32))
+	{
+		kill(number, SIGUSR1);
+		counter = 0;
+		number = 0;
+		status = 0;
+	}
+	else if ((status == 0) && (counter == 8))
 	{
 		ft_putchar(number);
 		counter = 0;
+		if (number == 0)
+			status = 1;
 		number = 0;
 	}
 }

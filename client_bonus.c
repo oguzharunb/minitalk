@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   client.c                                           :+:      :+:    :+:   */
+/*   client_bonus.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: obastug <obastug@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/12/31 13:29:06 by obastug           #+#    #+#             */
-/*   Updated: 2024/12/31 15:11:22 by obastug          ###   ########.fr       */
+/*   Created: 2024/12/31 14:44:50 by obastug           #+#    #+#             */
+/*   Updated: 2024/12/31 14:44:50 by obastug          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,31 @@
 
 int	ft_atoi(const char *nptr);
 int	ft_strlen(const char *str);
+
+void	msg_retrieved(int sig)
+{
+	if (sig == SIGUSR1)
+	{
+		write(STDOUT_FILENO, "message retrieved", 17);
+		exit(0);
+	}
+}
+
+void	send_int_to_pid(__pid_t pid, int number)
+{
+	size_t	i;
+
+	i = 0;
+	while (i < 32)
+	{
+		if ((number >> i) & 1)
+			kill(pid, SIGUSR1);
+		else
+			kill(pid, SIGUSR2);
+		i++;
+		usleep(700);
+	}
+}
 
 void	send_string_to_pid(int server_pid, const char *str)
 {
@@ -37,12 +62,14 @@ void	send_string_to_pid(int server_pid, const char *str)
 			break ;
 		str++;
 	}
+	send_int_to_pid(server_pid, getpid());
 }
 
 int	main(int argc, char const *argv[])
 {
 	int	pid;
 
+	signal(SIGUSR1, msg_retrieved);
 	if (argc != 3)
 	{
 		write(STDOUT_FILENO, "using: client <server_pid> <text>\n", 34);
@@ -55,5 +82,6 @@ int	main(int argc, char const *argv[])
 		return (1);
 	}
 	send_string_to_pid(pid, argv[2]);
+	pause();
 	return (0);
 }
